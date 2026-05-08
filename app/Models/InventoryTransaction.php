@@ -35,10 +35,13 @@ class InventoryTransaction extends Model
             // Reload item to get fresh quantity
             $item->refresh();
 
-            if ($item->quantity < 5) {
-                $admins = User::where('role', 'admin')->get();
+            // Trigger low stock alert if needed
+            $reorderLevel = $item->reorder_level ?? 5;
+            if ($item->quantity <= $reorderLevel) {
+                \Illuminate\Support\Facades\Log::info("Triggering low stock alert for {$item->name} (Qty: {$item->quantity}, Level: {$reorderLevel})");
+                $admins = User::whereIn('role', ['admin', 'stock_manager'])->get();
                 foreach($admins as $admin) {
-                     $admin->notify(new \App\Notifications\LowStockNotification($item));
+                     $admin->notify(new \App\Notifications\RestockAlert($item));
                 }
             }
         });

@@ -23,6 +23,23 @@
     <form method="POST" action="{{ route('orders.store') }}">
         @csrf
 
+        <div class="card" style="max-width:560px;margin-bottom:1.5rem;">
+            <div class="card-header"><span class="card-title">General Info</span></div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label" for="supplier_id">Supplier <span class="req">*</span></label>
+                    <select name="supplier_id" id="supplier_id" class="form-control" required>
+                        <option value="">— Select Supplier —</option>
+                        @foreach($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                {{ $supplier->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header">
                 <span class="card-title">

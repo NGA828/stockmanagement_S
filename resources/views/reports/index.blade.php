@@ -58,7 +58,7 @@
                         </td>
                         <td>
                             <div class="actions-cell" style="justify-content:flex-end;">
-                                <a href="#" class="btn btn-ghost btn-sm">
+                                <a href="{{ asset('storage/' . $report->file_path) }}" target="_blank" class="btn btn-ghost btn-sm">
                                     <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                                     Download
                                 </a>

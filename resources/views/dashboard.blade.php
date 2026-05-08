@@ -186,13 +186,34 @@
                     <div class="stat-icon stat-icon-blue">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/></svg>
                     </div>
-                    <span class="stat-badge stat-badge-up">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 16H4z"/></svg>
-                        Live
-                    </span>
+                    <span class="stat-badge stat-badge-up">Items</span>
                 </div>
                 <div class="stat-value">{{ number_format($totalItems) }}</div>
                 <div class="stat-label">Total Items</div>
+            </div>
+
+            {{-- Total Stock Value --}}
+            <div class="stat-card">
+                <div class="stat-card-top">
+                    <div class="stat-icon stat-icon-green">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 1v22m10-18H7a3 3 0 000 6h10a3 3 0 010 6H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <span class="stat-badge stat-badge-up">Valuation</span>
+                </div>
+                <div class="stat-value" style="font-size:1.4rem;">{{ number_format($totalStockValue, 0) }} <small style="font-size:0.7rem;font-weight:600;">FCFA</small></div>
+                <div class="stat-label">Inventory Value</div>
+            </div>
+
+            {{-- Suppliers --}}
+            <div class="stat-card">
+                <div class="stat-card-top">
+                    <div class="stat-icon stat-icon-purple">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1" stroke="currentColor" stroke-width="2"/></svg>
+                    </div>
+                    <span class="stat-badge stat-badge-up">Active</span>
+                </div>
+                <div class="stat-value">{{ number_format($totalSuppliers) }}</div>
+                <div class="stat-label">Suppliers</div>
             </div>
 
             {{-- Pending Orders --}}
@@ -201,36 +222,22 @@
                     <div class="stat-icon stat-icon-amber">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2"/><path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </div>
-                    <span class="stat-badge {{ $pendingOrders > 0 ? 'stat-badge-down' : 'stat-badge-neutral' }}">
-                        Pending
-                    </span>
+                    <span class="stat-badge {{ $pendingOrders > 0 ? 'stat-badge-down' : 'stat-badge-neutral' }}">Pending</span>
                 </div>
                 <div class="stat-value">{{ number_format($pendingOrders) }}</div>
-                <div class="stat-label">Pending Orders</div>
+                <div class="stat-label">Open Orders</div>
             </div>
 
-            {{-- Today's Transactions --}}
+            {{-- Total Dispatches --}}
             <div class="stat-card">
                 <div class="stat-card-top">
-                    <div class="stat-icon stat-icon-green">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M21 13v2a4 4 0 01-4 4H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <div class="stat-icon stat-icon-rose">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/></svg>
                     </div>
-                    <span class="stat-badge stat-badge-up">Today</span>
+                    <span class="stat-badge stat-badge-up">Outbound</span>
                 </div>
-                <div class="stat-value">{{ number_format($todayTransactions) }}</div>
-                <div class="stat-label">Today's Transactions</div>
-            </div>
-
-            {{-- Total Users --}}
-            <div class="stat-card">
-                <div class="stat-card-top">
-                    <div class="stat-icon stat-icon-purple">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </div>
-                    <span class="stat-badge stat-badge-up">Total</span>
-                </div>
-                <div class="stat-value">{{ number_format($totalUsers) }}</div>
-                <div class="stat-label">Total Users</div>
+                <div class="stat-value">{{ number_format($totalDispatches) }}</div>
+                <div class="stat-label">Total Dispatches</div>
             </div>
         </div>
 
@@ -239,7 +246,7 @@
     ───────────────────────────────── --}}
     @elseif(Auth::user()->role === 'stock_manager')
 
-        <div class="stat-grid stat-grid-3">
+        <div class="stat-grid stat-grid-4">
             <div class="stat-card">
                 <div class="stat-card-top">
                     <div class="stat-icon stat-icon-blue">
@@ -253,13 +260,24 @@
 
             <div class="stat-card">
                 <div class="stat-card-top">
+                    <div class="stat-icon stat-icon-green">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 1v22m10-18H7a3 3 0 000 6h10a3 3 0 010 6H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <span class="stat-badge stat-badge-up">Valuation</span>
+                </div>
+                <div class="stat-value" style="font-size:1.4rem;">{{ number_format($totalStockValue, 0) }} <small style="font-size:0.7rem;font-weight:600;">FCFA</small></div>
+                <div class="stat-label">Inventory Value</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-top">
                     <div class="stat-icon stat-icon-amber">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2"/><path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </div>
                     <span class="stat-badge {{ $pendingOrders > 0 ? 'stat-badge-down' : 'stat-badge-neutral' }}">Pending</span>
                 </div>
                 <div class="stat-value">{{ number_format($pendingOrders) }}</div>
-                <div class="stat-label">Pending Orders</div>
+                <div class="stat-label">Open Orders</div>
             </div>
 
             <div class="stat-card">
@@ -267,10 +285,10 @@
                     <div class="stat-icon stat-icon-rose">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
-                    <span class="stat-badge {{ $needingAttention > 0 ? 'stat-badge-down' : 'stat-badge-neutral' }}">Action Required</span>
+                    <span class="stat-badge {{ $needingAttention > 0 ? 'stat-badge-down' : 'stat-badge-neutral' }}">Low Stock</span>
                 </div>
                 <div class="stat-value">{{ number_format($needingAttention) }}</div>
-                <div class="stat-label">Items Near Low Stock</div>
+                <div class="stat-label">Restock Needed</div>
             </div>
         </div>
 
@@ -304,6 +322,32 @@
         </div>
 
     @endif
+
+    {{-- ─────────────────────────────────
+         CHARTS ROW
+    ───────────────────────────────── --}}
+    <div class="dash-row" style="margin-bottom:1.25rem;">
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">Transaction Trends (Last 7 Days)</span></div>
+            <div style="padding:1.25rem;"><canvas id="txChart" style="max-height:220px;"></canvas></div>
+        </div>
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">Monthly Financial Flow (PO vs Sales)</span></div>
+            <div style="padding:1.25rem;"><canvas id="flowChart" style="max-height:220px;"></canvas></div>
+        </div>
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">Stock by Category</span></div>
+            <div style="padding:1.25rem;"><canvas id="catChart" style="max-height:220px;"></canvas></div>
+        </div>
+    </div>
+
+    <style>
+        .dash-row-3 { grid-template-columns: 1fr 1fr 340px; }
+    </style>
+    <script>
+        // Update grid for 3 columns if needed
+        document.querySelector('.dash-row').classList.add('dash-row-3');
+    </script>
 
     {{-- ─────────────────────────────────
          MAIN CONTENT ROW
@@ -478,4 +522,89 @@
     </div>
     @endif
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Transaction Trends Chart
+            const txCtx = document.getElementById('txChart').getContext('2d');
+            new Chart(txCtx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($txChartData->pluck('date')) !!},
+                    datasets: [{
+                        label: 'Transactions',
+                        data: {!! json_encode($txChartData->pluck('count')) !!},
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Financial Flow Chart
+            const flowCtx = document.getElementById('flowChart').getContext('2d');
+            new Chart(flowCtx, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($monthlyFlow->pluck('month')) !!},
+                    datasets: [
+                        {
+                            label: 'Purchases',
+                            data: {!! json_encode($monthlyFlow->pluck('purchases')) !!},
+                            backgroundColor: '#6366f1'
+                        },
+                        {
+                            label: 'Sales',
+                            data: {!! json_encode($monthlyFlow->pluck('sales')) !!},
+                            backgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    }
+                }
+            });
+
+            // Category Distribution Chart
+            const catCtx = document.getElementById('catChart').getContext('2d');
+// ...
+            new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode($categoriesData->pluck('name')) !!},
+                    datasets: [{
+                        data: {!! json_encode($categoriesData->pluck('count')) !!},
+                        backgroundColor: [
+                            '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true, font: { size: 11 } } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        });
+    </script>
 </x-app-layout>

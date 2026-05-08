@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Category;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,7 +40,8 @@ class ItemController extends Controller
             $data['image'] = $path;
         }
 
-        Item::create($data);
+        $item = Item::create($data);
+        ActivityLog::log('CREATED', $item, "Created new item: {$item->name}");
         return redirect()->route('items.index')->with('success', 'Item created.');
     }
 
@@ -70,11 +72,20 @@ class ItemController extends Controller
         }
 
         $item->update($data);
+        ActivityLog::log('UPDATED', $item, "Updated item details for: {$item->name}");
+
+        // Check for low stock alert
+        if ($item->quantity <= ($item->reorder_level ?? 10)) {
+            $admins = \App\Models\User::whereIn('role', ['admin', 'stock_manager'])->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\RestockAlert($item));
+        }
+
         return redirect()->route('items.index')->with('success', 'Item updated.');
     }
 
     public function destroy(Item $item)
     {
+        ActivityLog::log('DELETED', $item, "Soft-deleted item: {$item->name}");
         $item->delete();
         return redirect()->route('items.index')->with('success', 'Item deleted.');
     }

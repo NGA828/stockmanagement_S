@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Category extends Model
+class Supplier extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'contact_person', 'email', 'phone', 'address'];
 
-    public function items()
+    public function orders()
     {
-        return $this->hasMany(Item::class);
+        return $this->hasMany(Order::class);
     }
 }

@@ -10,6 +10,9 @@
         <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -290,6 +293,11 @@
                     </div>
 
                     <div class="header-actions">
+                        {{-- Global Search Trigger --}}
+                        <button class="notif-btn" onclick="openSearch()" title="Search (Ctrl+K)">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        </button>
+
                         {{-- Dark mode toggle --}}
                         <button class="dark-toggle" onclick="document.documentElement.classList.toggle('dark');this.querySelector('.sun').style.display=document.documentElement.classList.contains('dark')?'block':'none';this.querySelector('.moon').style.display=document.documentElement.classList.contains('dark')?'none':'block';" title="Toggle dark mode">
                             <svg class="moon" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -297,10 +305,43 @@
                         </button>
 
                         {{-- Notification --}}
-                        <button class="notif-btn" title="Notifications">
-                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                            <span class="notif-dot"></span>
-                        </button>
+                        <div style="position:relative;" id="notifWrap">
+                            <button class="notif-btn" onclick="toggleNotifMenu()" title="Notifications">
+                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                @if(Auth::user()->unreadNotifications->count() > 0)
+                                    <span class="notif-dot">{{ Auth::user()->unreadNotifications->count() }}</span>
+                                @endif
+                            </button>
+                            <div class="user-dropdown" id="notifMenu" style="display:none; width: 300px; padding: 0.5rem 0;">
+                                <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--header-border); display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-weight: 700; font-size: 0.85rem;">Notifications</span>
+                                    @if(Auth::user()->unreadNotifications->count() > 0)
+                                        <a href="{{ route('notifications.markAllRead') }}" style="font-size: 0.7rem; color: var(--accent); text-decoration: none; font-weight: 600;">Mark all as read</a>
+                                    @endif
+                                </div>
+                                <div style="max-height: 300px; overflow-y: auto;">
+                                    @forelse(Auth::user()->notifications->take(10) as $notif)
+                                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--header-border); background: {{ $notif->read_at ? 'transparent' : 'var(--main-bg)' }}">
+                                            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">{{ $notif->data['message'] }}</div>
+                                            <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px;">{{ $notif->created_at->diffForHumans() }}</div>
+                                        </div>
+                                    @empty
+                                        <div style="padding: 1.5rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem;">No notifications</div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+
+                        <style>
+                            .notif-dot {
+                                position: absolute; top: 0px; right: 0px;
+                                min-width: 16px; height: 16px; padding: 0 4px;
+                                background: #ef4444; border-radius: 10px;
+                                border: 2px solid var(--header-bg);
+                                color: #fff; font-size: 0.6rem; font-weight: 800;
+                                display: flex; align-items: center; justify-content: center;
+                            }
+                        </style>
 
                         {{-- User dropdown --}}
                         <div style="position:relative;" id="userMenuWrap">
@@ -327,6 +368,57 @@
                     </div>
                 </header>
 
+                {{-- Command Palette Modal --}}
+                <div id="searchModal" class="search-modal" style="display:none;" onclick="if(event.target==this) closeSearch()">
+                    <div class="search-box-container">
+                        <div class="search-input-wrap">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                            <input type="text" id="globalSearchInput" placeholder="Search items, orders, clients..." oninput="doGlobalSearch(this.value)">
+                            <div class="search-kbd">ESC</div>
+                        </div>
+                        <div id="searchResults" class="search-results">
+                            {{-- Results injected here --}}
+                        </div>
+                    </div>
+                </div>
+
+                <style>
+                    .search-modal {
+                        position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+                        z-index: 1000; display: flex; justify-content: center; padding-top: 10vh;
+                    }
+                    .search-box-container {
+                        width: 100%; max-width: 600px; background: var(--card-bg); border-radius: 16px;
+                        box-shadow: 0 20px 50px rgba(0,0,0,0.2); overflow: hidden; height: min-content;
+                        border: 1px solid var(--header-border); animation: searchAppear 0.2s ease-out;
+                    }
+                    @keyframes searchAppear { from { opacity:0; transform: translateY(-20px); } to { opacity:1; transform: translateY(0); } }
+                    .search-input-wrap {
+                        display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem;
+                        border-bottom: 1px solid var(--header-border);
+                    }
+                    .search-input-wrap input {
+                        flex: 1; background: none; border: none; font-size: 1.1rem; color: var(--text-primary); outline: none;
+                    }
+                    .search-kbd {
+                        background: var(--main-bg); border: 1px solid var(--header-border);
+                        padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: var(--text-secondary);
+                    }
+                    .search-results { max-height: 400px; overflow-y: auto; padding: 0.5rem 0; }
+                    .search-item {
+                        display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem;
+                        text-decoration: none; transition: background 0.1s;
+                    }
+                    .search-item:hover { background: var(--main-bg); }
+                    .search-item-icon {
+                        width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+                        background: rgba(99,102,241,0.1); color: var(--accent); flex-shrink: 0;
+                    }
+                    .search-item-info { flex: 1; }
+                    .search-item-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+                    .search-item-type { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+                </style>
+
                 {{-- Page Content --}}
                 <main class="page-content">
                     {{ $slot }}
@@ -343,15 +435,83 @@
             }
             function toggleUserMenu() {
                 const menu = document.getElementById('userMenu');
+                const nMenu = document.getElementById('notifMenu');
+                if(nMenu) nMenu.style.display = 'none';
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+            function toggleNotifMenu() {
+                const menu = document.getElementById('notifMenu');
+                const uMenu = document.getElementById('userMenu');
+                if(uMenu) uMenu.style.display = 'none';
                 menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
             }
             document.addEventListener('click', function(e) {
-                const wrap = document.getElementById('userMenuWrap');
-                if (wrap && !wrap.contains(e.target)) {
-                    const menu = document.getElementById('userMenu');
-                    if (menu) menu.style.display = 'none';
+                const uWrap = document.getElementById('userMenuWrap');
+                const nWrap = document.getElementById('notifWrap');
+                
+                if (uWrap && !uWrap.contains(e.target)) {
+                    const uMenu = document.getElementById('userMenu');
+                    if (uMenu) uMenu.style.display = 'none';
+                }
+                if (nWrap && !nWrap.contains(e.target)) {
+                    const nMenu = document.getElementById('notifMenu');
+                    if (nMenu) nMenu.style.display = 'none';
                 }
             });
+
+            function openSearch() {
+                document.getElementById('searchModal').style.display = 'flex';
+                document.getElementById('globalSearchInput').focus();
+            }
+            function closeSearch() {
+                document.getElementById('searchModal').style.display = 'none';
+                document.getElementById('globalSearchInput').value = '';
+                document.getElementById('searchResults').innerHTML = '';
+            }
+
+            // Keyboard shortcuts
+            window.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    openSearch();
+                }
+                if (e.key === 'Escape') {
+                    closeSearch();
+                }
+            });
+
+            let searchTimeout;
+            function doGlobalSearch(query) {
+                clearTimeout(searchTimeout);
+                if (query.length < 2) {
+                    document.getElementById('searchResults').innerHTML = '';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    fetch(`/search/global?q=${encodeURIComponent(query)}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            const results = document.getElementById('searchResults');
+                            if (data.length === 0) {
+                                results.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--text-secondary);font-size:0.9rem;">No results found.</div>';
+                                return;
+                            }
+                            results.innerHTML = data.map(item => `
+                                <a href="${item.url}" class="search-item">
+                                    <div class="search-item-icon">
+                                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                                    </div>
+                                    <div class="search-item-info">
+                                        <div class="search-item-title">${item.title} ${item.meta ? '<span style="opacity:0.5;font-weight:400;margin-left:0.5rem;">'+item.meta+'</span>' : ''}</div>
+                                        <div class="search-item-type">${item.type}</div>
+                                    </div>
+                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                </a>
+                            `).join('');
+                        });
+                }, 300);
+            }
         </script>
     </body>
 </html>

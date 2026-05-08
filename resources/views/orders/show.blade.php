@@ -40,6 +40,13 @@
                     <div class="detail-value">{{ $order->expected_delivery ? \Carbon\Carbon::parse($order->expected_delivery)->format('d M Y') : 'Not specified' }}</div>
                 </div>
                 <div class="detail-item">
+                    <div class="detail-key">Supplier</div>
+                    <div class="detail-value" style="font-weight:700;">{{ $order->supplier->name ?? 'N/A' }}</div>
+                    @if($order->supplier)
+                        <div style="font-size:0.75rem;color:var(--text-secondary);">{{ $order->supplier->phone }} · {{ $order->supplier->email }}</div>
+                    @endif
+                </div>
+                <div class="detail-item">
                     <div class="detail-key">Created By</div>
                     <div class="detail-value">{{ $order->user->name ?? 'N/A' }}</div>
                 </div>

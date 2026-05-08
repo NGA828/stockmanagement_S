@@ -73,7 +73,32 @@
                 <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2"/>
                 <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Orders
+            Purchase Orders
+        </a>
+
+        <a href="{{ route('dispatches.index') }}"
+           class="nav-item {{ request()->routeIs('dispatches.*') ? 'active' : '' }}">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
+                <path d="M5 8h14M5 12h14M5 16h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Dispatches (OUT)
+        </a>
+
+        <a href="{{ route('suppliers.index') }}"
+           class="nav-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
+                <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Suppliers
+        </a>
+
+        <a href="{{ route('clients.index') }}"
+           class="nav-item {{ request()->routeIs('clients.*') ? 'active' : '' }}">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m12-10a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Clients
         </a>
         @endif
 
@@ -87,9 +112,17 @@
             Transactions
         </a>
 
-        {{-- ── REPORTS (admin + stock_manager) ── --}}
         @if(Auth::user()->role === 'admin' || Auth::user()->role === 'stock_manager')
         <p class="sidebar-section-label">Analytics</p>
+
+        <a href="{{ route('orders.procurement') }}"
+           class="nav-item {{ request()->routeIs('orders.procurement') ? 'active' : '' }}">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
+                <path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Procurement
+        </a>
 
         <a href="{{ route('reports.index') }}"
            class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
@@ -99,8 +132,6 @@
             Reports
         </a>
         @endif
-
-        {{-- ── ADMIN SECTION ── --}}
         @if(Auth::user()->role === 'admin')
         <p class="sidebar-section-label">Admin</p>
 
@@ -112,6 +143,14 @@
                 <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
             Users
+        </a>
+
+        <a href="{{ route('activity-logs.index') }}"
+           class="nav-item {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Audit Trail
         </a>
         @endif
 

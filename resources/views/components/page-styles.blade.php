@@ -112,16 +112,17 @@
 .form-control {
     background: var(--main-bg);
     border: 1px solid var(--header-border);
-    border-radius: 9px;
-    padding: 0.65rem 0.9rem;
-    font-size: 0.875rem; color: var(--text-primary);
-    transition: all 0.18s ease;
+    border-radius: 10px;
+    padding: 0.65rem 0.95rem;
+    font-size: 0.88rem; color: var(--text-primary);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none; width: 100%;
     font-family: 'Inter', sans-serif;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
 }
 .form-control:focus {
     border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.1), inset 0 1px 2px rgba(0,0,0,0.02);
     background: var(--card-bg);
 }
 .form-control::placeholder { color: var(--text-secondary); }

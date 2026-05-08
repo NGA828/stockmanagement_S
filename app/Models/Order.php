@@ -9,7 +9,12 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_number', 'created_by', 'status', 'order_date', 'expected_delivery', 'notes'];
+    protected $fillable = ['order_number', 'created_by', 'supplier_id', 'status', 'order_date', 'expected_delivery', 'notes'];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 
     protected function casts(): array
     {
@@ -22,6 +27,13 @@ class Order extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getTotalAmountAttribute()
+    {
+        return $this->orderItems->sum(function($item) {
+            return ($item->quantity_received ?: $item->quantity_ordered) * $item->unit_price;
+        });
     }
 
     public function user()

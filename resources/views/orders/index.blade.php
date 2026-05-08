@@ -11,93 +11,120 @@
 
     <div class="page-hdr">
         <div>
-            <div class="page-hdr-title">Purchase Orders</div>
-            <div class="page-hdr-sub">Track and manage all incoming stock orders</div>
+            <div class="page-hdr-title">Stock Movements</div>
+            <div class="page-hdr-sub">Track incoming purchases and outgoing sales</div>
         </div>
-        <a href="{{ route('orders.create') }}" class="btn btn-primary">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-            New Order
-        </a>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">All Orders ({{ $orders->count() }})</span>
-        </div>
+    {{-- Tab Headers --}}
+    <div style="display:flex; gap:1rem; margin-bottom:1.25rem; border-bottom:1px solid var(--header-border);">
+        <button onclick="showTab('in')" id="tab-in" class="tab-btn active">Purchase IN (Orders)</button>
+        <button onclick="showTab('out')" id="tab-out" class="tab-btn">Purchase OUT (Sales)</button>
+    </div>
 
-        @if($orders->count())
-        <div style="overflow-x:auto;">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Order No.</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Created By</th>
-                        <th>Total</th>
-                        <th style="text-align:right;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($orders as $order)
-                    <tr>
-                        <td>
-                            <span style="font-weight:700;color:#6366f1;font-size:0.9rem;">{{ $order->order_number }}</span>
-                        </td>
-                        <td>
-                            @php
-                                $sc = match($order->status) {
-                                    'completed' => 'badge-success',
-                                    'cancelled' => 'badge-danger',
-                                    'pending'   => 'badge-warning',
-                                    default     => 'badge-gray',
-                                };
-                            @endphp
-                            <span class="badge {{ $sc }}">{{ ucfirst($order->status) }}</span>
-                        </td>
-                        <td style="color:var(--text-secondary);">
-                            {{ \Carbon\Carbon::parse($order->order_date)->format('d M Y') }}
-                        </td>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:0.5rem;">
-                                <div class="avatar" style="width:26px;height:26px;font-size:0.65rem;">
-                                    {{ strtoupper(substr($order->user->name ?? '?', 0, 2)) }}
+    {{-- Purchase IN Section --}}
+    <div id="section-in" class="tab-section">
+        <div class="card">
+            <div class="card-header"><span class="card-title">Incoming Orders ({{ $orders->count() }})</span></div>
+            @if($orders->count())
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order No.</th>
+                            <th>Supplier</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($orders as $order)
+                        <tr>
+                            <td style="font-weight:700;color:#6366f1;">{{ $order->order_number }}</td>
+                            <td>{{ $order->supplier->name ?? 'N/A' }}</td>
+                            <td><span class="amount" style="font-weight:700;">{{ number_format($order->total_amount, 0, '.', ' ') }} FCFA</span></td>
+                            <td>
+                                @php $sc = match($order->status){ 'completed'=>'badge-success', 'cancelled'=>'badge-danger', 'pending'=>'badge-warning', default=>'badge-gray' }; @endphp
+                                <span class="badge {{ $sc }}">{{ ucfirst($order->status) }}</span>
+                            </td>
+                            <td style="color:var(--text-secondary);">{{ $order->order_date->format('d M Y') }}</td>
+                            <td>
+                                <div class="actions-cell" style="justify-content:flex-end;">
+                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-ghost btn-sm">View</a>
                                 </div>
-                                <span style="font-size:0.83rem;">{{ $order->user->name ?? 'N/A' }}</span>
-                            </div>
-                        </td>
-                        <td><span class="amount">{{ number_format($order->total_amount ?? 0, 2) }} FCFA</span></td>
-                        <td>
-                            <div class="actions-cell" style="justify-content:flex-end;">
-                                <a href="{{ route('orders.show', $order) }}" class="btn btn-ghost btn-sm">
-                                    <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
-                                    View
-                                </a>
-                                @if($order->status !== 'completed' && $order->status !== 'cancelled')
-                                    <form action="{{ route('orders.update', $order) }}" method="POST" class="inline"
-                                          onsubmit="return confirm('Mark this order as completed? Stock levels will be updated.')">
-                                        @csrf @method('PUT')
-                                        <input type="hidden" name="status" value="completed">
-                                        <button type="submit" class="btn btn-success btn-sm">
-                                            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                                            Complete
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @else
-            <div class="empty-state">
-                <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="1.5"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.5"/></svg>
-                <h3>No orders yet</h3>
-                <p>Create your first purchase order to start tracking stock.</p>
-                <a href="{{ route('orders.create') }}" class="btn btn-primary">New Order</a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-        @endif
+            @else
+                <div class="empty-state"><p>No purchase orders found.</p></div>
+            @endif
+        </div>
     </div>
+
+    {{-- Purchase OUT Section --}}
+    <div id="section-out" class="tab-section" style="display:none;">
+        <div class="card">
+            <div class="card-header"><span class="card-title">Outgoing Sales ({{ $dispatches->count() }})</span></div>
+            @if($dispatches->count())
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Dispatch #</th>
+                            <th>Client</th>
+                            <th>Total Value</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($dispatches as $dispatch)
+                        <tr>
+                            <td style="font-weight:700;color:#10b981;">{{ $dispatch->dispatch_number }}</td>
+                            <td>{{ $dispatch->client->name ?? 'N/A' }}</td>
+                            <td><span class="amount" style="font-weight:700;">{{ number_format($dispatch->total_amount, 0, '.', ' ') }} FCFA</span></td>
+                            <td>
+                                @php $sc = match($dispatch->status){ 'shipped'=>'badge-success', 'cancelled'=>'badge-danger', 'pending'=>'badge-warning', 'draft'=>'badge-info', default=>'badge-gray' }; @endphp
+                                <span class="badge {{ $sc }}">{{ ucfirst($dispatch->status) }}</span>
+                            </td>
+                            <td style="color:var(--text-secondary);">{{ $dispatch->dispatch_date->format('d M Y') }}</td>
+                            <td>
+                                <div class="actions-cell" style="justify-content:flex-end;">
+                                    <a href="{{ route('dispatches.show', $dispatch) }}" class="btn btn-ghost btn-sm">View</a>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @else
+                <div class="empty-state"><p>No sales dispatches found.</p></div>
+            @endif
+        </div>
+    </div>
+
+    <style>
+        .tab-btn {
+            padding: 0.75rem 1.25rem; background: none; border: none; font-size: 0.88rem; font-weight: 600;
+            color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: #6366f1; border-bottom-color: #6366f1; background: rgba(99,102,241,0.05); }
+    </style>
+
+    <script>
+        function showTab(type) {
+            document.querySelectorAll('.tab-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('section-' + type).style.display = 'block';
+            document.getElementById('tab-' + type).classList.add('active');
+        }
+    </script>
 </x-app-layout>
