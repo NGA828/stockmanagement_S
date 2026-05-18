@@ -73,9 +73,9 @@
                         <label class="form-label" for="role">Role <span class="req">*</span></label>
                         <select name="role" id="role" class="form-control" required>
                             <option value="">— Select a role —</option>
-                            <option value="admin"         {{ old('role', $user->role ?? '') === 'admin'         ? 'selected' : '' }}>Admin — Full access</option>
-                            <option value="stock_manager" {{ old('role', $user->role ?? '') === 'stock_manager' ? 'selected' : '' }}>Stock Manager — Manage inventory & orders</option>
-                            <option value="viewer"        {{ old('role', $user->role ?? '') === 'viewer'        ? 'selected' : '' }}>Viewer — Read-only access</option>
+                            <option value="admin"           {{ old('role', $user->role ?? '') === 'admin'           ? 'selected' : '' }}>Admin — Full access</option>
+                            <option value="stock_manager"  {{ old('role', $user->role ?? '') === 'stock_manager'  ? 'selected' : '' }}>Stock Manager — Manage inventory & orders</option>
+                            <option value="warehouse_staff" {{ old('role', $user->role ?? '') === 'warehouse_staff' ? 'selected' : '' }}>Warehouse Staff — Day-to-day operations</option>
                         </select>
                         @error('role')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
